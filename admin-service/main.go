@@ -33,7 +33,7 @@ func main() {
 	// Initialize GoAdmin
 	eng := engine.Default()
 	
-	// Configure GoAdmin
+	// Configure GoAdmin with enhanced settings for full CRUD operations
 	adminCfg := &adminConfig.Config{
 		Databases: adminConfig.DatabaseList{
 			"default": {
@@ -54,8 +54,11 @@ func main() {
 		Debug:       config.AppConfig.GinMode == "debug",
 		ColorScheme: "skin-black",
 		Title:       "Admin Panel",
-		Logo:        "GoAdmin",
-		MiniLogo:    "GA",
+		Logo:        `<b>Admin</b> Panel`,
+		MiniLogo:    `<b>A</b>P`,
+		IndexUrl:    "/admin",
+		LoginUrl:    "/admin/login",
+		Theme:       "adminlte",
 	}
 
 	// Setup GoAdmin plugins
