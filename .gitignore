@@ -19,6 +19,9 @@ go.work
 
 # Environment files
 .env
+.env.local
+admin-service/.env
+api-service/.env
 
 # IDE
 .idea/

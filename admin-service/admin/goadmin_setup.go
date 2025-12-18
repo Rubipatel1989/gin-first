@@ -12,13 +12,15 @@ var Adm *admin.Admin
 // SetupGoAdmin initializes and adds the GoAdmin plugin to the engine
 func SetupGoAdmin(eng *engine.Engine) error {
 	// Initialize admin plugin with table generators
-	Adm = admin.NewAdmin(&table.Generator{
-		Generators: map[string]table.Generator{
-			"users":  GetUsersTable,
-			"stores": GetStoresTable,
-			"brands": GetBrandsTable,
-		},
-	})
+	// Create a map of generators
+	generators := map[string]table.Generator{
+		"users":  GetUsersTable,
+		"stores": GetStoresTable,
+		"brands": GetBrandsTable,
+	}
+	
+	// Initialize admin plugin
+	Adm = admin.NewAdmin(generators)
 
 	// Add admin plugin to engine
 	eng.AddPlugins(Adm)

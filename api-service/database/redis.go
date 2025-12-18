@@ -6,7 +6,7 @@ import (
 	"log"
 	"strconv"
 
-	"gin-first/config"
+	"api-service/config"
 
 	"github.com/go-redis/redis/v8"
 )

@@ -1,234 +1,214 @@
-# Gin Framework Admin Panel & API
+# Microservices Architecture
 
-A Go application built with Gin framework featuring **GoAdmin** admin panel for CRUD operations and API endpoints for Flutter applications.
+This repository contains two separate microservices:
 
-## Features
+1. **Admin Panel Service** - GoAdmin-based admin panel for managing data
+2. **API Service** - REST API for frontend applications (Flutter, Mobile, Web)
 
-- ✅ **GoAdmin Panel** - Professional admin panel framework with:
-  - Users management (Full CRUD)
-  - Stores management (Full CRUD)
-  - Brands management (Full CRUD)
-  - Built-in authentication and authorization
-  - Advanced filtering and sorting
-  - Responsive design
-- ✅ RESTful API endpoints for Flutter app:
-  - User list API
-  - Brand list API
-- ✅ MySQL database integration with GORM
-- ✅ Redis integration for caching
-- ✅ Environment-based configuration
-- ✅ CORS middleware enabled
-
-## Prerequisites
-
-- Go 1.21 or higher
-- MySQL 5.7+ or MySQL 8.0+
-- Redis server
-
-## Installation
-
-1. **Clone the repository** (if applicable) or navigate to the project directory:
-   ```bash
-   cd gin-first
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   go mod download
-   ```
-
-3. **Configure environment variables**:
-   - Copy `.env.example` to `.env` (or edit the existing `.env` file)
-   - Update the database credentials and Redis configuration:
-     ```env
-     DB_HOST=localhost
-     DB_PORT=3306
-     DB_USER=root
-     DB_PASSWORD=your_password
-     DB_NAME=gin_first_db
-     
-     REDIS_HOST=localhost
-     REDIS_PORT=6379
-     ```
-
-4. **Create MySQL database**:
-   ```sql
-   CREATE DATABASE gin_first_db;
-   ```
-
-5. **Start Redis server** (if not running):
-   ```bash
-   redis-server
-   ```
-
-6. **Run the application**:
-   ```bash
-   go run main.go
-   ```
-
-   The server will start on port 8080 (or the port specified in `.env`).
-
-7. **Access the GoAdmin Panel**:
-   - Open your browser and navigate to: `http://localhost:8080/admin`
-   - **Default Login**: GoAdmin will prompt you to create an admin user on first access
-   - The admin panel provides a professional interface to manage Users, Stores, and Brands
-
-## GoAdmin Panel
-
-The GoAdmin panel is accessible at `http://localhost:8080/admin`. It provides:
-
-- **Professional UI**: AdminLTE theme with modern design
-- **Full CRUD Operations**: Create, Read, Update, Delete for all entities
-- **Advanced Features**:
-  - Filtering and searching
-  - Sorting capabilities
-  - Pagination
-  - Export functionality
-  - Custom field displays (status badges, images)
-- **User-friendly Forms**: Built-in form validation and field types
-- **Status Management**: Toggle active/inactive status for records
-
-### Admin Panel Sections
-
-1. **Users Management**: Manage user accounts with name, email, phone, and status
-2. **Stores Management**: Manage store information including address, contact details
-3. **Brands Management**: Manage brand information with descriptions and logos
-
-### First Time Setup
-
-On first access to `/admin`, GoAdmin will guide you through:
-1. Creating the initial admin user
-2. Setting up authentication
-3. Configuring the admin panel
-
-## API Endpoints
-
-> **Note**: The admin panel is now handled by GoAdmin at `/admin`. The API endpoints below are for the Flutter application.
-
-### Admin Panel (GoAdmin)
-- `GET /admin` - GoAdmin login and dashboard
-- GoAdmin automatically provides CRUD interfaces for:
-  - `/admin/info/users` - Users management
-  - `/admin/info/stores` - Stores management
-  - `/admin/info/brands` - Brands management
-
-### Legacy API Endpoints (for backward compatibility)
-
-#### Users
-- `GET /admin/users` - Get all users
-- `GET /admin/users/:id` - Get user by ID
-- `POST /admin/users` - Create new user
-- `PUT /admin/users/:id` - Update user
-- `DELETE /admin/users/:id` - Delete user
-
-#### Stores
-- `GET /admin/stores` - Get all stores
-- `GET /admin/stores/:id` - Get store by ID
-- `POST /admin/stores` - Create new store
-- `PUT /admin/stores/:id` - Update store
-- `DELETE /admin/stores/:id` - Delete store
-
-#### Brands
-- `GET /admin/brands` - Get all brands
-- `GET /admin/brands/:id` - Get brand by ID
-- `POST /admin/brands` - Create new brand
-- `PUT /admin/brands/:id` - Update brand
-- `DELETE /admin/brands/:id` - Delete brand
-
-### Flutter API Endpoints
-
-- `GET /api/users?page=1&limit=10` - Get paginated user list (active users only)
-- `GET /api/brands?page=1&limit=10` - Get paginated brand list (active brands only)
-
-### Health Check
-- `GET /health` - Server health check
-
-## Example API Requests
-
-### Create User (Admin)
-```bash
-curl -X POST http://localhost:8080/admin/users \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "phone": "+1234567890"
-  }'
-```
-
-### Get User List (Flutter API)
-```bash
-curl http://localhost:8080/api/users?page=1&limit=10
-```
-
-### Create Brand (Admin)
-```bash
-curl -X POST http://localhost:8080/admin/brands \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Nike",
-    "description": "Just Do It",
-    "logo": "https://example.com/nike-logo.png"
-  }'
-```
-
-### Get Brand List (Flutter API)
-```bash
-curl http://localhost:8080/api/brands?page=1&limit=10
-```
+Both services share the same database but run independently on different ports.
 
 ## Project Structure
 
 ```
-gin-first/
-├── admin/           # GoAdmin configuration
-│   ├── goadmin_setup.go  # GoAdmin initialization
-│   └── tables.go         # Table definitions for Users, Stores, Brands
-├── config/          # Configuration management
-├── database/        # Database connections (MySQL & Redis)
-├── handlers/        # API request handlers (for Flutter)
-├── middleware/      # Middleware functions
-├── models/          # Data models (GORM)
-├── routes/          # Route definitions
-├── static/          # Static files (legacy, GoAdmin handles UI now)
-├── .env            # Environment variables
-├── go.mod          # Go module file
-├── go.sum          # Go dependencies checksum
-└── main.go         # Application entry point
+.
+├── admin-service/          # Admin Panel Microservice
+│   ├── admin/              # GoAdmin configuration
+│   ├── config/             # Configuration management
+│   ├── database/           # Database connections
+│   ├── models/             # Data models
+│   └── main.go             # Admin service entry point
+│
+├── api-service/            # API Microservice
+│   ├── handlers/           # API handlers
+│   ├── routes/             # Route definitions
+│   ├── middleware/         # Middleware (CORS, etc.)
+│   ├── config/             # Configuration management
+│   ├── database/           # Database connections
+│   ├── models/             # Data models
+│   └── main.go             # API service entry point
+│
+└── README.md               # This file
 ```
 
-## Database Models
+## Prerequisites
 
-### User
-- ID, Name, Email, Phone, Status, CreatedAt, UpdatedAt
+- Go 1.21.5 or higher
+- MySQL 5.7+ or MySQL 8.0+
+- Redis (optional, for caching)
+- Environment variables configured (see `.env.example`)
 
-### Store
-- ID, Name, Address, Phone, Email, Status, CreatedAt, UpdatedAt
+## Setup
 
-### Brand
-- ID, Name, Description, Logo, Status, CreatedAt, UpdatedAt
+### 1. Environment Configuration
 
-## Environment Variables
+Each service has its own `.env` file. Copy the `.env.example` file in each service directory and configure it:
 
-All configuration is managed through the `.env` file:
+**Admin Service:**
+```bash
+cd admin-service
+cp .env.example .env
+# Edit .env with your configuration
+```
 
-- `SERVER_PORT` - Server port (default: 8080)
-- `GIN_MODE` - Gin mode: debug or release
-- `DB_HOST` - MySQL host
-- `DB_PORT` - MySQL port
-- `DB_USER` - MySQL username
-- `DB_PASSWORD` - MySQL password
-- `DB_NAME` - MySQL database name
-- `REDIS_HOST` - Redis host
-- `REDIS_PORT` - Redis port
-- `REDIS_PASSWORD` - Redis password (optional)
-- `REDIS_DB` - Redis database number
-- `JWT_SECRET` - JWT secret key (for future authentication)
+**API Service:**
+```bash
+cd api-service
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+Each service's `.env` file should contain:
+
+**admin-service/.env:**
+```env
+# Server Configuration
+ADMIN_SERVER_PORT=8080
+GIN_MODE=debug
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=gin_first_db
+
+# Redis Configuration (optional)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+
+# JWT Secret
+JWT_SECRET=your_jwt_secret_key_here
+```
+
+**api-service/.env:**
+```env
+# Server Configuration
+API_SERVER_PORT=8081
+GIN_MODE=debug
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=gin_first_db
+
+# Redis Configuration (optional)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+
+# JWT Secret
+JWT_SECRET=your_jwt_secret_key_here
+```
+
+### 2. Install Dependencies
+
+Navigate to each service directory and install dependencies:
+
+```bash
+# Install Admin Service dependencies
+cd admin-service
+go mod download
+go mod tidy
+
+# Install API Service dependencies
+cd ../api-service
+go mod download
+go mod tidy
+```
+
+## Running the Services
+
+### Option 1: Run Services Separately
+
+**Terminal 1 - Admin Panel Service:**
+```bash
+cd admin-service
+go run main.go
+```
+
+The admin panel will be available at: `http://localhost:8080/admin`
+
+**Terminal 2 - API Service:**
+```bash
+cd api-service
+go run main.go
+```
+
+The API will be available at: `http://localhost:8081/api`
+
+### Option 2: Run Both Services with Scripts
+
+Create a simple script to run both services (see `run-services.sh` below).
+
+## API Endpoints
+
+### Admin Panel Service
+- **Admin Panel**: `http://localhost:8080/admin`
+- **Health Check**: `http://localhost:8080/health`
+
+### API Service
+- **Health Check**: `http://localhost:8081/health`
+- **Get Users**: `GET http://localhost:8081/api/users?page=1&limit=10`
+- **Get Brands**: `GET http://localhost:8081/api/brands?page=1&limit=10`
+- **Get Stores**: `GET http://localhost:8081/api/stores?page=1&limit=10`
+
+## Features
+
+### Admin Panel Service
+- Full CRUD operations through GoAdmin interface
+- Bootstrap-based admin panel (AdminLTE theme)
+- User management
+- Brand management
+- Store management
+- Database migrations
+
+### API Service
+- RESTful API endpoints
+- Pagination support
+- CORS enabled
+- Only returns active records
+- Health check endpoint
+
+## Database
+
+Both services connect to the same MySQL database. The first service to start will run migrations automatically.
 
 ## Development
 
-The application uses GORM for database migrations. Tables are automatically created when the application starts.
+### Adding New Models
 
-## License
+1. Add the model to both `admin-service/models/` and `api-service/models/`
+2. Add table configuration in `admin-service/admin/tables.go`
+3. Add API handler in `api-service/handlers/`
+4. Add route in `api-service/routes/routes.go`
 
-MIT
+### Building for Production
+
+```bash
+# Build Admin Service
+cd admin-service
+go build -o admin-service main.go
+
+# Build API Service
+cd ../api-service
+go build -o api-service main.go
+```
+
+## Notes
+
+- Both services can run simultaneously on different ports
+- They share the same database schema
+- Admin panel is for internal use, API is for external clients
+- Default admin credentials are set by GoAdmin (check GoAdmin documentation)
+
+## Troubleshooting
+
+1. **Port already in use**: Change `ADMIN_SERVER_PORT` or `API_SERVER_PORT` in the respective service's `.env` file
+2. **Database connection error**: Verify MySQL is running and credentials are correct in both `.env` files
+3. **Module not found**: Run `go mod tidy` in the respective service directory
+4. **Environment variables not loading**: Make sure `.env` file exists in each service directory (not in root)

@@ -34,7 +34,7 @@ func LoadConfig() {
 	}
 
 	AppConfig = &Config{
-		ServerPort: getEnv("SERVER_PORT", "8080"),
+		ServerPort: getEnv("API_SERVER_PORT", "8081"),
 		GinMode:    getEnv("GIN_MODE", "debug"),
 
 		DBHost:     getEnv("DB_HOST", "localhost"),

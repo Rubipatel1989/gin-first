@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"gin-first/handlers"
-	"gin-first/middleware"
+	"api-service/handlers"
+	"api-service/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,19 +17,22 @@ func SetupRoutes() *gin.Engine {
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status":  "ok",
+			"service": "api-service",
 			"message": "Server is running",
 		})
 	})
 
-	// Note: GoAdmin handles /admin routes for the admin panel
-	// The old API routes are kept for backward compatibility but can be removed
-	// GoAdmin provides full CRUD through its interface
-
-	// API Routes for Flutter
+	// API Routes for Frontend (Flutter/Mobile/Web)
 	api := r.Group("/api")
 	{
+		// User endpoints
 		api.GET("/users", handlers.GetUserList)
+
+		// Brand endpoints
 		api.GET("/brands", handlers.GetBrandList)
+
+		// Store endpoints
+		api.GET("/stores", handlers.GetStoreList)
 	}
 
 	return r

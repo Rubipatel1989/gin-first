@@ -3,10 +3,9 @@ package main
 import (
 	"log"
 
-	"gin-first/admin"
-	"gin-first/config"
-	"gin-first/database"
-	"gin-first/routes"
+	"admin-service/admin"
+	"admin-service/config"
+	"admin-service/database"
 
 	"github.com/GoAdminGroup/go-admin/engine"
 	adminConfig "github.com/GoAdminGroup/go-admin/modules/config"
@@ -25,11 +24,11 @@ func main() {
 	// Connect to MySQL
 	database.ConnectMySQL()
 
-	// Connect to Redis
+	// Connect to Redis (optional for admin panel)
 	database.ConnectRedis()
 
-	// Setup routes
-	r := routes.SetupRoutes()
+	// Create Gin router
+	r := gin.Default()
 
 	// Initialize GoAdmin
 	eng := engine.Default()
@@ -54,6 +53,9 @@ func main() {
 		Language:    "en",
 		Debug:       config.AppConfig.GinMode == "debug",
 		ColorScheme: "skin-black",
+		Title:       "Admin Panel",
+		Logo:        "GoAdmin",
+		MiniLogo:    "GA",
 	}
 
 	// Setup GoAdmin plugins
@@ -66,9 +68,17 @@ func main() {
 		log.Fatal("Failed to initialize GoAdmin:", err)
 	}
 
+	// Health check endpoint
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  "ok",
+			"service": "admin-panel",
+		})
+	})
+
 	// Start server
 	serverPort := ":" + config.AppConfig.ServerPort
-	log.Printf("Server starting on port %s", config.AppConfig.ServerPort)
+	log.Printf("Admin Panel starting on port %s", config.AppConfig.ServerPort)
 	log.Printf("GoAdmin panel available at http://localhost%s/admin", serverPort)
 	if err := r.Run(serverPort); err != nil {
 		log.Fatal("Failed to start server:", err)

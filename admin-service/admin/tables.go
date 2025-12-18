@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/GoAdminGroup/go-admin/context"
 	"github.com/GoAdminGroup/go-admin/modules/db"
 	"github.com/GoAdminGroup/go-admin/plugins/admin/modules/table"
 	"github.com/GoAdminGroup/go-admin/template/types"
@@ -8,8 +9,8 @@ import (
 )
 
 // GetUsersTable returns the users table configuration
-func GetUsersTable(ctx *table.Context) table.Table {
-	usersTable := table.NewDefaultTable(table.DefaultConfigWithDriver("mysql"))
+func GetUsersTable(ctx *context.Context) table.Table {
+	usersTable := table.NewDefaultTable(ctx)
 
 	info := usersTable.GetInfo()
 	info.AddField("ID", "id", db.Int).FieldSortable()
@@ -18,9 +19,9 @@ func GetUsersTable(ctx *table.Context) table.Table {
 	info.AddField("Phone", "phone", db.Varchar)
 	info.AddField("Status", "status", db.Varchar).FieldDisplay(func(value types.FieldModel) interface{} {
 		if value.Value == "active" {
-			return types.Label().SetContent("Active").SetColor("success").GetContent()
+			return `<span class="label label-success">Active</span>`
 		}
-		return types.Label().SetContent("Inactive").SetColor("danger").GetContent()
+		return `<span class="label label-danger">Inactive</span>`
 	})
 	info.AddField("Created At", "created_at", db.Datetime).FieldFilterable()
 	info.AddField("Updated At", "updated_at", db.Datetime)
@@ -28,7 +29,7 @@ func GetUsersTable(ctx *table.Context) table.Table {
 	info.SetTable("users").SetTitle("Users").SetDescription("Manage Users")
 
 	formList := usersTable.GetForm()
-	formList.AddField("ID", "id", db.Int, form.Default).FieldDisplayButCanNotEditWhenAdd()
+	formList.AddField("ID", "id", db.Int, form.Default).FieldNotAllowAdd()
 	formList.AddField("Name", "name", db.Varchar, form.Text).FieldMust()
 	formList.AddField("Email", "email", db.Varchar, form.Email).FieldMust()
 	formList.AddField("Phone", "phone", db.Varchar, form.Text)
@@ -38,8 +39,8 @@ func GetUsersTable(ctx *table.Context) table.Table {
 			{Text: "Inactive", Value: "inactive"},
 		}).
 		FieldDefault("active")
-	formList.AddField("Created At", "created_at", db.Datetime, form.Datetime).FieldDisplayButCanNotEditWhenAdd()
-	formList.AddField("Updated At", "updated_at", db.Datetime, form.Datetime).FieldDisplayButCanNotEditWhenAdd()
+	formList.AddField("Created At", "created_at", db.Datetime, form.Datetime).FieldNotAllowAdd()
+	formList.AddField("Updated At", "updated_at", db.Datetime, form.Datetime).FieldNotAllowAdd()
 
 	formList.SetTable("users").SetTitle("Users").SetDescription("Manage Users")
 
@@ -47,8 +48,8 @@ func GetUsersTable(ctx *table.Context) table.Table {
 }
 
 // GetStoresTable returns the stores table configuration
-func GetStoresTable(ctx *table.Context) table.Table {
-	storesTable := table.NewDefaultTable(table.DefaultConfigWithDriver("mysql"))
+func GetStoresTable(ctx *context.Context) table.Table {
+	storesTable := table.NewDefaultTable(ctx)
 
 	info := storesTable.GetInfo()
 	info.AddField("ID", "id", db.Int).FieldSortable()
@@ -58,9 +59,9 @@ func GetStoresTable(ctx *table.Context) table.Table {
 	info.AddField("Email", "email", db.Varchar).FieldFilterable(types.FilterType{Operator: types.FilterOperatorLike})
 	info.AddField("Status", "status", db.Varchar).FieldDisplay(func(value types.FieldModel) interface{} {
 		if value.Value == "active" {
-			return types.Label().SetContent("Active").SetColor("success").GetContent()
+			return `<span class="label label-success">Active</span>`
 		}
-		return types.Label().SetContent("Inactive").SetColor("danger").GetContent()
+		return `<span class="label label-danger">Inactive</span>`
 	})
 	info.AddField("Created At", "created_at", db.Datetime).FieldFilterable()
 	info.AddField("Updated At", "updated_at", db.Datetime)
@@ -68,7 +69,7 @@ func GetStoresTable(ctx *table.Context) table.Table {
 	info.SetTable("stores").SetTitle("Stores").SetDescription("Manage Stores")
 
 	formList := storesTable.GetForm()
-	formList.AddField("ID", "id", db.Int, form.Default).FieldDisplayButCanNotEditWhenAdd()
+	formList.AddField("ID", "id", db.Int, form.Default).FieldNotAllowAdd()
 	formList.AddField("Name", "name", db.Varchar, form.Text).FieldMust()
 	formList.AddField("Address", "address", db.Varchar, form.Text)
 	formList.AddField("Phone", "phone", db.Varchar, form.Text)
@@ -79,8 +80,8 @@ func GetStoresTable(ctx *table.Context) table.Table {
 			{Text: "Inactive", Value: "inactive"},
 		}).
 		FieldDefault("active")
-	formList.AddField("Created At", "created_at", db.Datetime, form.Datetime).FieldDisplayButCanNotEditWhenAdd()
-	formList.AddField("Updated At", "updated_at", db.Datetime, form.Datetime).FieldDisplayButCanNotEditWhenAdd()
+	formList.AddField("Created At", "created_at", db.Datetime, form.Datetime).FieldNotAllowAdd()
+	formList.AddField("Updated At", "updated_at", db.Datetime, form.Datetime).FieldNotAllowAdd()
 
 	formList.SetTable("stores").SetTitle("Stores").SetDescription("Manage Stores")
 
@@ -88,8 +89,8 @@ func GetStoresTable(ctx *table.Context) table.Table {
 }
 
 // GetBrandsTable returns the brands table configuration
-func GetBrandsTable(ctx *table.Context) table.Table {
-	brandsTable := table.NewDefaultTable(table.DefaultConfigWithDriver("mysql"))
+func GetBrandsTable(ctx *context.Context) table.Table {
+	brandsTable := table.NewDefaultTable(ctx)
 
 	info := brandsTable.GetInfo()
 	info.AddField("ID", "id", db.Int).FieldSortable()
@@ -97,15 +98,15 @@ func GetBrandsTable(ctx *table.Context) table.Table {
 	info.AddField("Description", "description", db.Text)
 	info.AddField("Logo", "logo", db.Varchar).FieldDisplay(func(value types.FieldModel) interface{} {
 		if value.Value != "" {
-			return types.Img().SetSrc(value.Value).SetWidth("50").SetHeight("50").GetContent()
+			return `<img src="` + value.Value + `" style="max-width: 50px; max-height: 50px;" />`
 		}
 		return "-"
 	})
 	info.AddField("Status", "status", db.Varchar).FieldDisplay(func(value types.FieldModel) interface{} {
 		if value.Value == "active" {
-			return types.Label().SetContent("Active").SetColor("success").GetContent()
+			return `<span class="label label-success">Active</span>`
 		}
-		return types.Label().SetContent("Inactive").SetColor("danger").GetContent()
+		return `<span class="label label-danger">Inactive</span>`
 	})
 	info.AddField("Created At", "created_at", db.Datetime).FieldFilterable()
 	info.AddField("Updated At", "updated_at", db.Datetime)
@@ -113,7 +114,7 @@ func GetBrandsTable(ctx *table.Context) table.Table {
 	info.SetTable("brands").SetTitle("Brands").SetDescription("Manage Brands")
 
 	formList := brandsTable.GetForm()
-	formList.AddField("ID", "id", db.Int, form.Default).FieldDisplayButCanNotEditWhenAdd()
+	formList.AddField("ID", "id", db.Int, form.Default).FieldNotAllowAdd()
 	formList.AddField("Name", "name", db.Varchar, form.Text).FieldMust()
 	formList.AddField("Description", "description", db.Text, form.TextArea)
 	formList.AddField("Logo", "logo", db.Varchar, form.Text).FieldPlaceholder("Logo URL")
@@ -123,8 +124,8 @@ func GetBrandsTable(ctx *table.Context) table.Table {
 			{Text: "Inactive", Value: "inactive"},
 		}).
 		FieldDefault("active")
-	formList.AddField("Created At", "created_at", db.Datetime, form.Datetime).FieldDisplayButCanNotEditWhenAdd()
-	formList.AddField("Updated At", "updated_at", db.Datetime, form.Datetime).FieldDisplayButCanNotEditWhenAdd()
+	formList.AddField("Created At", "created_at", db.Datetime, form.Datetime).FieldNotAllowAdd()
+	formList.AddField("Updated At", "updated_at", db.Datetime, form.Datetime).FieldNotAllowAdd()
 
 	formList.SetTable("brands").SetTitle("Brands").SetDescription("Manage Brands")
 

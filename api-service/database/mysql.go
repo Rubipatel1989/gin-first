@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"gin-first/config"
-	"gin-first/models"
+	"api-service/config"
+	"api-service/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
