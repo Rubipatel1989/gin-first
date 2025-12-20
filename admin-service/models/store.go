@@ -8,11 +8,11 @@ import (
 
 type Store struct {
 	ID          uint           `json:"id" gorm:"primaryKey"`
-	Name        string         `json:"name" gorm:"not null"`
-	Address     string         `json:"address"`
-	Phone       string         `json:"phone"`
-	Email       string         `json:"email"`
-	Status      string         `json:"status" gorm:"default:active"`
+	Name        string         `json:"name" gorm:"type:varchar(255);not null"`
+	Address     string         `json:"address" gorm:"type:text"`
+	Phone       string         `json:"phone" gorm:"type:varchar(50)"`
+	Email       string         `json:"email" gorm:"type:varchar(255)"`
+	Status      string         `json:"status" gorm:"type:varchar(50);default:active"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`

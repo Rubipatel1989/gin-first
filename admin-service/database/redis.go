@@ -14,7 +14,7 @@ import (
 var RedisClient *redis.Client
 var ctx = context.Background()
 
-func ConnectRedis() {
+func ConnectRedis() error {
 	db, err := strconv.Atoi(config.AppConfig.RedisDB)
 	if err != nil {
 		db = 0
@@ -29,10 +29,11 @@ func ConnectRedis() {
 	// Test connection
 	_, err = RedisClient.Ping(ctx).Result()
 	if err != nil {
-		log.Fatal("Failed to connect to Redis:", err)
+		return fmt.Errorf("failed to connect to Redis: %w", err)
 	}
 
 	log.Println("Redis connected successfully")
+	return nil
 }
 
 func GetRedisClient() *redis.Client {

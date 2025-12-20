@@ -24,15 +24,18 @@ func main() {
 	// Connect to MySQL
 	database.ConnectMySQL()
 
-	// Connect to Redis (optional for admin panel)
-	database.ConnectRedis()
+	// Initialize GoAdmin system tables before GoAdmin starts
+	database.InitGoAdminTables()
 
-	// Create Gin router
+	// Connect to Redis (optional for admin panel)
+	if err := database.ConnectRedis(); err != nil {
+		log.Printf("Warning: Redis connection failed (optional): %v", err)
+		log.Println("Continuing without Redis...")
+	}
+
+	// Create Gin router first
 	r := gin.Default()
 
-	// Initialize GoAdmin
-	eng := engine.Default()
-	
 	// Configure GoAdmin with enhanced settings for full CRUD operations
 	adminCfg := &adminConfig.Config{
 		Databases: adminConfig.DatabaseList{
@@ -61,15 +64,20 @@ func main() {
 		Theme:       "adminlte",
 	}
 
+	// Initialize GoAdmin engine
+	eng := engine.Default()
+	
 	// Setup GoAdmin plugins
 	if err := admin.SetupGoAdmin(eng); err != nil {
 		log.Fatal("Failed to setup GoAdmin:", err)
 	}
 
-	// Add GoAdmin to Gin router
+	// Add GoAdmin to Gin router (this will register all GoAdmin routes)
 	if err := eng.AddConfig(adminCfg).Use(r); err != nil {
 		log.Fatal("Failed to initialize GoAdmin:", err)
 	}
+
+	log.Println("GoAdmin routes registered successfully")
 
 	// Health check endpoint
 	r.GET("/health", func(c *gin.Context) {
@@ -77,6 +85,11 @@ func main() {
 			"status":  "ok",
 			"service": "admin-panel",
 		})
+	})
+
+	// Root redirect to admin
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(302, "/admin")
 	})
 
 	// Start server
