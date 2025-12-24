@@ -44,7 +44,7 @@ This document provides detailed technical specifications for implementing the Ch
 
 ### Backend Services
 
-- **Language**: Go (Golang) 1.21+
+- **Language**: Go (Golang) 1.24+
 - **Web Framework**: Gin (https://github.com/gin-gonic/gin)
 - **Database ORM**: GORM (https://gorm.io/)
 - **Database**: MySQL 8.0+ (as per business requirements)
