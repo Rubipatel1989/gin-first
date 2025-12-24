@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"api-service/database"
-	"api-service/models"
+	"mobile-api-service/database"
+	"mobile-api-service/models"
 
 	"github.com/gin-gonic/gin"
 )

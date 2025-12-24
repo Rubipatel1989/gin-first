@@ -6,7 +6,7 @@ import (
 	"log"
 	"strconv"
 
-	"api-service/config"
+	"mobile-api-service/config"
 
 	"github.com/go-redis/redis/v8"
 )

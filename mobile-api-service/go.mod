@@ -1,4 +1,4 @@
-module api-service
+module mobile-api-service
 
 go 1.21.5
 

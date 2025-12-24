@@ -4,38 +4,38 @@ import (
 	"net/http"
 	"strconv"
 
-	"api-service/database"
-	"api-service/models"
+	"mobile-api-service/database"
+	"mobile-api-service/models"
 
 	"github.com/gin-gonic/gin"
 )
 
-// API for Frontend - Get User List
-func GetUserList(c *gin.Context) {
-	var users []models.User
+// API for Frontend - Get Brand List
+func GetBrandList(c *gin.Context) {
+	var brands []models.Brand
 	
 	// Get query parameters for pagination
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	offset := (page - 1) * limit
 
-	// Get only active users
+	// Get only active brands
 	result := database.DB.Where("status = ?", "active").
 		Offset(offset).
 		Limit(limit).
-		Find(&users)
+		Find(&brands)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch brands"})
 		return
 	}
 
 	var total int64
-	database.DB.Model(&models.User{}).Where("status = ?", "active").Count(&total)
+	database.DB.Model(&models.Brand{}).Where("status = ?", "active").Count(&total)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"data":    users,
+		"data":    brands,
 		"pagination": gin.H{
 			"page":  page,
 			"limit": limit,

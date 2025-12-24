@@ -18,7 +18,7 @@ Both services share the same database but run independently on different ports.
 │   ├── models/             # Data models
 │   └── main.go             # Admin service entry point
 │
-├── api-service/            # API Microservice
+├── mobile-api-service/     # Mobile App API Microservice
 │   ├── handlers/           # API handlers
 │   ├── routes/             # Route definitions
 │   ├── middleware/         # Middleware (CORS, etc.)
@@ -50,9 +50,9 @@ cp .env.example .env
 # Edit .env with your configuration
 ```
 
-**API Service:**
+**Mobile API Service:**
 ```bash
-cd api-service
+cd mobile-api-service
 cp .env.example .env
 # Edit .env with your configuration
 ```
@@ -82,7 +82,7 @@ REDIS_DB=0
 JWT_SECRET=your_jwt_secret_key_here
 ```
 
-**api-service/.env:**
+**mobile-api-service/.env:**
 ```env
 # Server Configuration
 API_SERVER_PORT=8081
@@ -115,8 +115,8 @@ cd admin-service
 go mod download
 go mod tidy
 
-# Install API Service dependencies
-cd ../api-service
+# Install Mobile API Service dependencies
+cd ../mobile-api-service
 go mod download
 go mod tidy
 ```
@@ -133,13 +133,13 @@ go run main.go
 
 The admin panel will be available at: `http://localhost:8080/admin`
 
-**Terminal 2 - API Service:**
+**Terminal 2 - Mobile API Service:**
 ```bash
-cd api-service
+cd mobile-api-service
 go run main.go
 ```
 
-The API will be available at: `http://localhost:8081/api`
+The Mobile API will be available at: `http://localhost:8081/api`
 
 ### Option 2: Run Both Services with Scripts
 
@@ -151,7 +151,7 @@ Create a simple script to run both services (see `run-services.sh` below).
 - **Admin Panel**: `http://localhost:8080/admin`
 - **Health Check**: `http://localhost:8080/health`
 
-### API Service
+### Mobile API Service
 - **Health Check**: `http://localhost:8081/health`
 - **Get Users**: `GET http://localhost:8081/api/users?page=1&limit=10`
 - **Get Brands**: `GET http://localhost:8081/api/brands?page=1&limit=10`
@@ -167,8 +167,8 @@ Create a simple script to run both services (see `run-services.sh` below).
 - Store management
 - Database migrations
 
-### API Service
-- RESTful API endpoints
+### Mobile API Service
+- RESTful API endpoints for mobile app
 - Pagination support
 - CORS enabled
 - Only returns active records
@@ -182,10 +182,10 @@ Both services connect to the same MySQL database. The first service to start wil
 
 ### Adding New Models
 
-1. Add the model to both `admin-service/models/` and `api-service/models/`
+1. Add the model to both `admin-service/models/` and `mobile-api-service/models/`
 2. Add table configuration in `admin-service/admin/tables.go`
-3. Add API handler in `api-service/handlers/`
-4. Add route in `api-service/routes/routes.go`
+3. Add API handler in `mobile-api-service/handlers/`
+4. Add route in `mobile-api-service/routes/routes.go`
 
 ### Building for Production
 
@@ -194,9 +194,9 @@ Both services connect to the same MySQL database. The first service to start wil
 cd admin-service
 go build -o admin-service main.go
 
-# Build API Service
-cd ../api-service
-go build -o api-service main.go
+# Build Mobile API Service
+cd ../mobile-api-service
+go build -o mobile-api-service main.go
 ```
 
 ## Notes
@@ -208,7 +208,7 @@ go build -o api-service main.go
 
 ## Troubleshooting
 
-1. **Port already in use**: Change `ADMIN_SERVER_PORT` or `API_SERVER_PORT` in the respective service's `.env` file
+1. **Port already in use**: Change `ADMIN_SERVER_PORT` or `MOBILE_API_SERVER_PORT` in the respective service's `.env` file
 2. **Database connection error**: Verify MySQL is running and credentials are correct in both `.env` files
 3. **Module not found**: Run `go mod tidy` in the respective service directory
 4. **Environment variables not loading**: Make sure `.env` file exists in each service directory (not in root)

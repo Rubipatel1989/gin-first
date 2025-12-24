@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"api-service/config"
-	"api-service/database"
-	"api-service/routes"
+	"mobile-api-service/config"
+	"mobile-api-service/database"
+	"mobile-api-service/routes"
 
 	"github.com/gin-gonic/gin"
 )

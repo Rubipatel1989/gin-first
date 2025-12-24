@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"api-service/config"
-	"api-service/models"
+	"mobile-api-service/config"
+	"mobile-api-service/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

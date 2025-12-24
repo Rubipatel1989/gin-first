@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"api-service/handlers"
-	"api-service/middleware"
+	"mobile-api-service/handlers"
+	"mobile-api-service/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,7 +17,7 @@ func SetupRoutes() *gin.Engine {
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status":  "ok",
-			"service": "api-service",
+			"service": "mobile-api-service",
 			"message": "Server is running",
 		})
 	})
