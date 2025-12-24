@@ -34,7 +34,7 @@ CREATE TABLE users (
     phone VARCHAR(50),
     password_hash VARCHAR(255) NOT NULL,
     email_verified BOOLEAN DEFAULT FALSE,
-    status TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1=active, 2=inactive, 3=suspended',
+    status TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1=active, 2=inactive, 3=suspended, 4=pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
@@ -81,6 +81,82 @@ CREATE TABLE password_resets (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
     INDEX idx_token (token),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Player signup requests (for self-registration approval workflow)
+CREATE TABLE player_signup_requests (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL, -- User ID (pending player account)
+    organization_id SMALLINT UNSIGNED NOT NULL,
+    team_id INT UNSIGNED, -- Optional
+    requested_by BIGINT UNSIGNED NOT NULL, -- Self (same as user_id)
+    reviewed_by BIGINT UNSIGNED, -- Coach/OrgAdmin who reviews
+    status TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1=pending, 2=approved, 3=rejected',
+    reviewed_at TIMESTAMP NULL,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_organization_id (organization_id),
+    INDEX idx_team_id (team_id),
+    INDEX idx_status (status),
+    INDEX idx_reviewed_by (reviewed_by)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Player invitations (for invitation-based player signup)
+CREATE TABLE player_invitations (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    organization_id SMALLINT UNSIGNED NOT NULL,
+    team_id INT UNSIGNED, -- Optional
+    coach_id BIGINT UNSIGNED NOT NULL, -- User ID of coach
+    invitation_code VARCHAR(50) NOT NULL UNIQUE,
+    player_email VARCHAR(255),
+    player_name VARCHAR(255),
+    expires_at TIMESTAMP NULL,
+    used_at TIMESTAMP NULL,
+    used_by BIGINT UNSIGNED, -- Player user ID if used
+    status TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1=pending, 2=used, 3=expired',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_invitation_code (invitation_code),
+    INDEX idx_coach_id (coach_id),
+    INDEX idx_organization_id (organization_id),
+    INDEX idx_status (status),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Parent-Player relationships
+CREATE TABLE parent_players (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    parent_id BIGINT UNSIGNED NOT NULL, -- User ID (Parent)
+    player_id BIGINT UNSIGNED NOT NULL, -- User ID (Player)
+    relationship VARCHAR(50), -- e.g., "Mother", "Father", "Guardian"
+    status TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1=pending, 2=approved, 3=rejected',
+    approved_by BIGINT UNSIGNED, -- Player user ID if approved by player
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_parent_id (parent_id),
+    INDEX idx_player_id (player_id),
+    INDEX idx_status (status),
+    UNIQUE KEY unique_parent_player (parent_id, player_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Parent invitations (for invitation-based parent signup)
+CREATE TABLE parent_invitations (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    player_id BIGINT UNSIGNED NOT NULL, -- User ID (Player)
+    invited_by BIGINT UNSIGNED NOT NULL, -- User ID (Coach or Player)
+    invitation_code VARCHAR(50) NOT NULL UNIQUE,
+    parent_email VARCHAR(255),
+    relationship VARCHAR(50),
+    expires_at TIMESTAMP NULL,
+    used_at TIMESTAMP NULL,
+    used_by BIGINT UNSIGNED, -- Parent user ID if used
+    status TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1=pending, 2=used, 3=expired',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_invitation_code (invitation_code),
+    INDEX idx_player_id (player_id),
+    INDEX idx_invited_by (invited_by),
+    INDEX idx_status (status),
     INDEX idx_expires_at (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -696,6 +772,8 @@ INSERT INTO notification_templates (name, type, subject, body_template, is_activ
 --    - announcement_attachments, notification_preferences, notification_devices
 --    - video_permissions, academic_entries, life_goals
 --    - recruiting_profiles, profile_shares, profile_permissions
+--    - player_signup_requests, player_invitations, parent_invitations
+--    - parent_players (parent-player relationships)
 -- 
 -- 3. SMALLINT UNSIGNED: Small lookup/reference tables
 --    - organizations (max 65,535 organizations)
@@ -704,7 +782,7 @@ INSERT INTO notification_templates (name, type, subject, body_template, is_activ
 -- 
 -- 4. TINYINT UNSIGNED: ENUM replacements (status fields, types, roles)
 --    All ENUM columns converted to TINYINT with COMMENT showing mapping
---    - users.status: 1=active, 2=inactive, 3=suspended
+--    - users.status: 1=active, 2=inactive, 3=suspended, 4=pending (for player signup requests)
 --    - user_roles.role: 1=SuperAdmin, 2=OrgAdmin, 3=Coach, 4=AssistantCoach, 5=Player, 6=Parent
 --    - organizations.type: 1=college, 2=club, 3=academy
 --    - organizations.status: 1=active, 2=inactive
@@ -724,6 +802,10 @@ INSERT INTO notification_templates (name, type, subject, body_template, is_activ
 --    - video_permissions.permission_type: 1=public, 2=team, 3=player, 4=parent
 --    - life_goals.status: 1=active, 2=completed, 3=paused
 --    - profile_permissions.permission_type: 1=public, 2=coach, 3=college, 4=recruiter
+--    - player_signup_requests.status: 1=pending, 2=approved, 3=rejected
+--    - player_invitations.status: 1=pending, 2=used, 3=expired
+--    - parent_invitations.status: 1=pending, 2=used, 3=expired
+--    - parent_players.status: 1=pending, 2=approved, 3=rejected
 -- 
 -- FOREIGN KEY STRATEGY:
 -- - Foreign keys use matching integer type to referenced table
